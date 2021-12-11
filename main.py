@@ -91,7 +91,7 @@ def count_10(param_1):
 def count_10_1(param_2, param_3):
     global lab4
     n = []
-    x = text1.get()
+    x = int(text1.get())
     while True:
         r = x % param_2
         for key, value in tetr_2.items():
