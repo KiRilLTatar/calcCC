@@ -1,28 +1,29 @@
 import tkinter as tk
+# import eel
 
-import eel
-
-win = tk.Tk()  # создание окна и разбиение на части
-win.title("Калькулятор СС")  # создание окна и разбиение на части
-win.iconphoto(True, tk.PhotoImage(file='icons8-калькулятор-48.png'))
+win = tk.Tk()  # создание окна
+win.title("Калькулятор СС")  # создание окна
+win.iconphoto(True, tk.PhotoImage(file='icons8-калькулятор-48.png'))  # подключаем иконку
 w_win = win.winfo_screenwidth()
 h_win = win.winfo_screenheight()
 w_win = w_win // 2  # середина экрана
 h_win = h_win // 2
 w = w_win - 400  # смещение от середины
 h = h_win - 300
-win.geometry('800x500+{}+{}'.format(w, h))
-win.wm_geometry("800x500")  # создание окна и разбиение на части
-win.resizable(False, False)  # создание окна и разбиение на части
+win.geometry('800x500+{}+{}'.format(w, h))  # задаем размеры окна и его расположение
+win.resizable(False, False)  # запрещаем изменение размеров окна
+
+tetr_1 = {'A': '10', 'B': '11', 'C': '12', 'D': '13', 'E': '14', 'F': '15'}
 
 tetr = {'0': '0000', '1': '0001', '2': '0010', '3': '0011', '4': '0100', '5': '0101', '6': '0110', '7': '0111',
-        '8': '1000',
-        '9': '1001', 'A': '1010', 'B': '1011', 'C': '1100', 'D': '1101', 'E': '1110', 'F': '1111'}
+        '8': '1000', '9': '1001', 'A': '1010', 'B': '1011', 'C': '1100', 'D': '1101', 'E': '1110', 'F': '1111'}
 
 tetr_2 = {'10': 'A', '11': 'B', '12': 'C', '13': 'D', '14': 'E', '15': 'F'}
 
+allowed_main = set('ABCDEF')  # массив для проверки
 
-def Error(change_1, change_2):
+
+def Error(change_1, change_2):  # окно ошибки
     global text1
     text1.delete(0, 'end')
     popup = tk.Toplevel()
@@ -46,7 +47,7 @@ lab4 = tk.Label(win, text='Результат', font='Arial 18')
 lab4.place(x=100, y=400)
 
 
-def count_0_9(param_1, param_2, param_3):
+def count_0_9(param_1, param_2, param_3):  # перевод из систем от 2 до 9 в любую другую
     global lab4
     n = []
     x = text1.get()
@@ -55,9 +56,15 @@ def count_0_9(param_1, param_2, param_3):
     h = 0
     m = 1
     for i in range(0, b):
-        c += int(x[h]) * (param_1 ** (b - m))  # возводим в степень каждую цифру и поочередно прибавляем их
-        h += 1  # берем вторую цифру и так поочередно
-        m += 1  # уменьшаем число на которое будем возводить
+        y = x[h]
+        if set(x[h]) <= allowed_main:
+            for key, value in tetr_1.items():
+                value = str(value)
+                y = str(y)
+                y = y.replace(key, value)
+        c += int(y) * (param_1 ** (b - m))
+        h += 1
+        m += 1
     while True:
         r = c % param_2
         for key, value in tetr_2.items():
@@ -73,7 +80,7 @@ def count_0_9(param_1, param_2, param_3):
     lab4.place(x=30, y=400)
 
 
-def count_10(param_1):
+def count_10(param_1):  # перевод в десятичную из любой другой
     global lab4
     x = text1.get()
     b = len(x)
@@ -81,14 +88,20 @@ def count_10(param_1):
     h = 0
     m = 1
     for i in range(0, b):
-        c += int(x[h]) * (param_1 ** (b - m))  # возводим в степень каждую цифру и поочередно приваляем их
+        y = x[h]
+        if set(x[h]) <= allowed_main:
+            for key, value in tetr_1.items():
+                value = str(value)
+                y = str(y)
+                y = y.replace(key, value)
+        c += int(y) * (param_1 ** (b - m))  # возводим в степень каждую цифру и поочередно прибавляем их
         h += 1  # берем вторую цифру и так поочередно
         m += 1  # уменьшаем число на которое будем возводить
     lab4 = tk.Label(win, text=f'Число в десятичной системе:' + str(c), font='Arial 18')
     lab4.place(x=30, y=400)
 
 
-def count_10_1(param_2, param_3):
+def count_10_1(param_2, param_3):  # из десятичной в любую другую
     global lab4
     n = []
     x = int(text1.get())
@@ -107,96 +120,98 @@ def count_10_1(param_2, param_3):
     lab4.place(x=30, y=400)
 
 
-def count_in_2():
-    global lab4
-    x = text1.get()
-    for key, value in tetr.items():
-        value = str(value)
-        x = x.replace(key, value)
-    x = int(x)
-    result = []
-    while x > 0:
-        result.append(x % 10)
-        x //= 10
-    result.reverse()
-    num = 0
-    for i, v in enumerate(reversed(result)):
-        num += v * 10 ** i
-    lab4 = tk.Label(win, text=f'Число в двоичной системе:' + str(num),
-                    font='Arial 18')
-    lab4.place(x=30, y=400)
+# def count_in_2():
+#     global lab4
+#     x = text1.get()
+#     for key, value in tetr.items():
+#         value = str(value)
+#         x = x.replace(key, value)
+#     x = int(x)
+#     result = []
+#     while x > 0:
+#         result.append(x % 10)
+#         x //= 10
+#     result.reverse()
+#     num = 0
+#     for i, v in enumerate(reversed(result)):
+#         num += v * 10 ** i
+#     lab4 = tk.Label(win, text=f'Число в двоичной системе:' + str(num),
+#                     font='Arial 18')
+#     lab4.place(x=30, y=400)
 
 
-def count_11_16(parametr_2, parametr_3):
-    global lab4
-    n = []
-    x = text1.get()
-    b = len(x)
-    c = 0
-    h = 0
-    m = 1
-    for key, value in tetr.items():
-        value = str(value)
-        x = x.replace(key, value)
-    x = int(x)
-    result = []
-    while x > 0:
-        result.append(x % 10)
-        x //= 10
-    result.reverse()
-    num = 0
-    for i, v in enumerate(reversed(result)):
-        num += v * 10 ** i
-    num = str(num)
-    for i in range(0, b):
-        c += int(num[h]) * (2 ** (b - m))  # возводим в степень каждую цифру и поочередно приваляем их
-        h += 1  # берем вторую цифру и так поочередно
-        m += 1  # уменьшаем число на которое будем возводить
-    while True:
-        r = c % parametr_2
-        for key, value in tetr_2.items():
-            value = str(value)
-            r = str(r)
-            r = r.replace(key, value)
-        n.append(str(r))
-        c //= parametr_2
-        if c / parametr_2 == 0:
-            break
-    rev = (n[::-1])
-    lab4 = tk.Label(win, text=f'Число в {parametr_3} системе:' + str(''.join(rev)),
-                    font='Arial 18')
-    lab4.place(x=30, y=400)
+# def count_10_2():
+#     global lab4
+#     n = []
+#     x = text1.get()
+#     b = len(x)
+#     c = 0
+#     h = 0
+#     m = 1
+#     for key, value in tetr.items():
+#         value = str(value)
+#         x = x.replace(key, value)
+#     x = int(x)
+#     result = []
+#     while x > 0:
+#         result.append(x % 10)
+#         x //= 10
+#     result.reverse()
+#     num = 0
+#     for i, v in enumerate(reversed(result)):
+#         num += v * 10 ** i
+#     num = str(num)
+#     for i in range(0, b):
+#         c += int(num[h]) * (2 ** (b - m))  # возводим в степень каждую цифру и поочередно приваляем их
+#         h += 1  # берем вторую цифру и так поочередно
+#         m += 1  # уменьшаем число на которое будем возводить
+#     lab4 = tk.Label(win, text=f'Число в десятеричной системе:' + str(c),
+#                     font='Arial 18')
+#     lab4.place(x=30, y=400)
 
 
-def count_10_2():
-    global lab4
-    n = []
-    x = text1.get()
-    b = len(x)
-    c = 0
-    h = 0
-    m = 1
-    for key, value in tetr.items():
-        value = str(value)
-        x = x.replace(key, value)
-    x = int(x)
-    result = []
-    while x > 0:
-        result.append(x % 10)
-        x //= 10
-    result.reverse()
-    num = 0
-    for i, v in enumerate(reversed(result)):
-        num += v * 10 ** i
-    num = str(num)
-    for i in range(0, b):
-        c += int(num[h]) * (2 ** (b - m))  # возводим в степень каждую цифру и поочередно приваляем их
-        h += 1  # берем вторую цифру и так поочередно
-        m += 1  # уменьшаем число на которое будем возводить
-    lab4 = tk.Label(win, text=f'Число в десятеричной системе:' + str(c),
-                    font='Arial 18')
-    lab4.place(x=30, y=400)
-
+# def count_11_16(parametr_2, parametr_3):
+#     global lab4
+#     n = []
+#     x = text1.get()
+#     b = len(x)
+#     c = 0
+#     h = 0
+#     m = 1
+#     for key, value in tetr.items():
+#         value = str(value)
+#         x = x.replace(key, value)
+#     x = int(x)
+#     print(x)
+#     result = []
+#     while x > 0:
+#         result.append(x % 10)
+#         x //= 10
+#     result.reverse()
+#     num = 0
+#     for i, v in enumerate(reversed(result)):
+#         num += v * 10 ** i
+#     num = str(num)
+#     print(num)
+#     for i in range(0, b):
+#         c += int(num[h]) * (2 ** (b - m))  # возводим в степень каждую цифру и поочередно приваляем их
+#         h += 1  # берем вторую цифру и так поочередно
+#         m += 1  # уменьшаем число на которое будем возводить
+#     print(c)
+#     while True:
+#         r = c % parametr_2
+#         for key, value in tetr_2.items():
+#             value = str(value)
+#             r = str(r)
+#             r = r.replace(key, value)
+#         n.append(str(r))
+#         c //= parametr_2
+#         if c / parametr_2 == 0:
+#             break
+#     rev = (n[::-1])
+#     lab4 = tk.Label(win, text=f'Число в {parametr_3} системе:' + str(''.join(rev)),
+#                     font='Arial 18')
+#     lab4.place(x=30, y=400)
 
 def count():
     global lab4
@@ -222,10 +237,10 @@ def count():
             return set(input_name) <= allowed
 
         if chek_1(input_name):
-            if var.get() == 0 and text3.get() == '2' or var1.get() == 0:  # из двоичной в двоичную
+            if var.get() == 0 and text3.get() == '2' or var1.get() == 0:
                 lab4 = tk.Label(win, text=f'Число в двоичной системе:' + str(text1.get()), font='Arial 18')
                 lab4.place(x=30, y=400)
-            elif var.get() == 0 and text3.get() == '3' or var1.get() == 1:  # из двоичной в троичную
+            elif var.get() == 0 and text3.get() == '3' or var1.get() == 1:
                 count_0_9(2, 3, 'троичной')
             elif var.get() == 0 and text3.get() == '4':
                 count_0_9(2, 4, 'четверичной')
@@ -394,33 +409,33 @@ def count():
 
         if chek_5(input_name):
             if var.get() == 4 and text3.get() == '2' or var1.get() == 0:
-                count_in_2()
+                count_0_9(16, 2, 'двоичной')
             elif var.get() == 4 and text3.get() == '3' or var1.get() == 1:
-                count_11_16(3, 'троичной')
+                count_0_9(16, 3, 'троичной')
             elif var.get() == 4 and text3.get() == '4':
-                count_11_16(4, 'четверичной')
+                count_0_9(16, 4, 'четверичной')
             elif var.get() == 4 and text3.get() == '5':
-                count_11_16(5, 'пятеричной')
+                count_0_9(16, 5, 'пятеричной')
             elif var.get() == 4 and text3.get() == '6':
-                count_11_16(6, 'шестеричной')
+                count_0_9(16, 6, 'шестеричной')
             elif var.get() == 4 and text3.get() == '7':
-                count_11_16(7, 'семеричной')
+                count_0_9(16, 7, 'семеричной')
             elif var.get() == 4 and text3.get() == '8' or var1.get() == 2:
-                count_11_16(8, 'восьмеричной')
+                count_0_9(16, 8, 'восьмеричной')
             elif var.get() == 4 and text3.get() == '9':
-                count_11_16(9, 'девятеричной')
+                count_0_9(16, 9, 'девятеричной')
             elif var.get() == 4 and text3.get() == '10' or var1.get() == 3:
-                count_10_2()
+                count_10(16)
             elif var.get() == 4 and text3.get() == '11':
-                count_11_16(11, 'одинадцатеричной')
+                count_0_9(16, 11, 'одинадцатеричной')
             elif var.get() == 4 and text3.get() == '12':
-                count_11_16(12, 'двенадцатеричной')
+                count_0_9(16, 12, 'двенадцатеричной')
             elif var.get() == 4 and text3.get() == '13':
-                count_11_16(13, 'тринадцатеричной')
+                count_0_9(16, 13, 'тринадцатеричной')
             elif var.get() == 4 and text3.get() == '14':
-                count_11_16(14, 'четырнадцатеричной')
+                count_0_9(16, 14, 'четырнадцатеричной')
             elif var.get() == 4 and text3.get() == '15':
-                count_11_16(15, 'пятнадцатеричной')
+                count_0_9(16, 15, 'пятнадцатеричной')
             elif var.get() == 4 and text3.get() == '16' or var1.get() == 4:
                 lab4 = tk.Label(win, text=f'Число в шестнадцатеричной системе:' + str(text1.get()),
                                 font='Arial 18')
@@ -814,35 +829,35 @@ def count():
 
             if chek_B(input_name):
                 if text2.get() == '11' and text3.get() == '2' or var1.get() == 0:
-                    count_in_2()
+                    count_0_9(11, 2, 'двоичной')
                 elif text2.get() == '11' and text3.get() == '3' or var1.get() == 1:
-                    count_11_16(3, 'троичной')
+                    count_0_9(11, 3, 'троичной')
                 elif text2.get() == '11' and text3.get() == '4':
-                    count_11_16(4, 'четверичной')
+                    count_0_9(11, 4, 'четверичной')
                 elif text2.get() == '11' and text3.get() == '5':
-                    count_11_16(5, 'пятеричной')
+                    count_0_9(11, 5, 'пятеричной')
                 elif text2.get() == '11' and text3.get() == '6':
-                    count_11_16(6, 'шестеричной')
+                    count_0_9(11, 6, 'шестеричной')
                 elif text2.get() == '11' and text3.get() == '7':
-                    count_11_16(7, 'семеричной')
+                    count_0_9(11, 7, 'семеричной')
                 elif text2.get() == '11' and text3.get() == '8' or var1.get() == 2:
-                    count_11_16(8, 'восьмеричной')
+                    count_0_9(11, 8, 'восьмеричной')
                 elif text2.get() == '11' and text3.get() == '9':
-                    count_11_16(9, 'девятеричной')
+                    count_0_9(11, 9, 'девятеричной')
                 elif text2.get() == '11' and text3.get() == '10' or var1.get() == 3:
-                    count_10_2()
+                    count_10(11)
                 elif text2.get() == '11' and text3.get() == '11':
                     lab4 = tk.Label(win, text=f'Число в одинадцатеричной системе:' + str(''.join(text1.get())),
                                     font='Arial 18')
                     lab4.place(x=30, y=400)
                 elif text2.get() == '11' and text3.get() == '12':
-                    count_11_16(12, 'двенадцатеричной')
+                    count_0_9(11, 12, 'двенадцатеричной')
                 elif text2.get() == '11' and text3.get() == '13':
-                    count_11_16(13, 'тринадцатеричной')
+                    count_0_9(11, 13, 'тринадцатеричной')
                 elif text2.get() == '11' and text3.get() == '14':
-                    count_11_16(14, 'четырнадцатеричной')
+                    count_0_9(11, 14, 'четырнадцатеричной')
                 elif text2.get() == '11' and text3.get() == '15':
-                    count_11_16(15, 'пятнадцатеричной')
+                    count_0_9(11, 15, 'пятнадцатеричной')
                 elif text2.get() == '11' and text3.get() == '16' or var1.get() == 4:
                     x = hex(int(text1.get(), 11))[2:].upper()
                     lab4 = tk.Label(win, text=f'Число в шестнадцатеричной системе:' + str(x),
@@ -856,37 +871,37 @@ def count():
 
             if chek_C(input_name):
                 if text2.get() == '12' and text3.get() == '2' or var1.get() == 0:
-                    count_in_2()
+                    count_0_9(12, 2, 'двоичной')
                 elif text2.get() == '12' and text3.get() == '3' or var1.get() == 1:
-                    count_11_16(3, 'троичной')
+                    count_0_9(12, 3, 'троичной')
                 elif text2.get() == '12' and text3.get() == '4':
-                    count_11_16(4, 'четверичной')
+                    count_0_9(12, 4, 'четверичной')
                 elif text2.get() == '12' and text3.get() == '5':
-                    count_11_16(5, 'пятеричной')
+                    count_0_9(12, 5, 'пятеричной')
                 elif text2.get() == '12' and text3.get() == '6':
-                    count_11_16(6, 'шестеричной')
+                    count_0_9(12, 6, 'шестеричной')
                 elif text2.get() == '12' and text3.get() == '7':
-                    count_11_16(7, 'семеричной')
+                    count_0_9(12, 7, 'семеричной')
                 elif text2.get() == '12' and text3.get() == '8' or var1.get() == 2:
-                    count_11_16(8, 'восьмеричной')
+                    count_0_9(12, 8, 'восьмеричной')
                 elif text2.get() == '12' and text3.get() == '9':
-                    count_11_16(9, 'девятеричной')
+                    count_0_9(12, 9, 'девятеричной')
                 elif text2.get() == '12' and text3.get() == '10' or var1.get() == 3:
-                    count_10_2()
+                    count_10(12)
                 elif text2.get() == '12' and text3.get() == '11':
-                    count_11_16(11, 'одинадцатеричной')
+                    count_0_9(12, 11, 'одинадцатеричной')
                 elif text2.get() == '12' and text3.get() == '12':
                     lab4 = tk.Label(win, text=f'Число в двенадцатеричной системе:' + str(''.join(text1.get())),
                                     font='Arial 18')
                     lab4.place(x=30, y=400)
                 elif text2.get() == '12' and text3.get() == '12':
-                    count_11_16(12, 'двенадцатеричной')
+                    count_0_9(12, 12, 'двенадцатеричной')
                 elif text2.get() == '12' and text3.get() == '13':
-                    count_11_16(13, 'тринадцатеричной')
+                    count_0_9(12, 13, 'тринадцатеричной')
                 elif text2.get() == '12' and text3.get() == '14':
-                    count_11_16(14, 'четырнадцатеричной')
+                    count_0_9(12, 14, 'четырнадцатеричной')
                 elif text2.get() == '12' and text3.get() == '15':
-                    count_11_16(15, 'пятнадцатеричной')
+                    count_0_9(12, 15, 'пятнадцатеричной')
                 elif text2.get() == '12' and text3.get() == '16' or var1.get() == 4:
                     x = hex(int(text1.get(), 12))[2:].upper()
                     lab4 = tk.Label(win, text=f'Число в шестнадцатеричной системе:' + str(x),
@@ -900,35 +915,35 @@ def count():
 
             if chek_D(input_name):
                 if text2.get() == '13' and text3.get() == '2' or var1.get() == 0:
-                    count_in_2()
+                    count_0_9(13, 2, 'двоичной')
                 elif text2.get() == '13' and text3.get() == '3' or var1.get() == 1:
-                    count_11_16(3, 'троичной')
+                    count_0_9(13, 3, 'троичной')
                 elif text2.get() == '13' and text3.get() == '4':
-                    count_11_16(4, 'четверичной')
+                    count_0_9(13, 4, 'четверичной')
                 elif text2.get() == '13' and text3.get() == '5':
-                    count_11_16(5, 'пятеричной')
+                    count_0_9(13, 5, 'пятеричной')
                 elif text2.get() == '13' and text3.get() == '6':
-                    count_11_16(6, 'шестеричной')
+                    count_0_9(13, 6, 'шестеричной')
                 elif text2.get() == '13' and text3.get() == '7':
-                    count_11_16(7, 'семеричной')
+                    count_0_9(13, 7, 'семеричной')
                 elif text2.get() == '13' and text3.get() == '8' or var1.get() == 2:
-                    count_11_16(8, 'восьмеричной')
+                    count_0_9(13, 8, 'восьмеричной')
                 elif text2.get() == '13' and text3.get() == '9':
-                    count_11_16(9, 'девятеричной')
+                    count_0_9(13, 9, 'девятеричной')
                 elif text2.get() == '13' and text3.get() == '10' or var1.get() == 3:
-                    count_10_2()
+                    count_10(13)
                 elif text2.get() == '13' and text3.get() == '11':
-                    count_11_16(11, 'одинадцатеричной')
+                    count_0_9(13, 11, 'одинадцатеричной')
                 elif text2.get() == '13' and text3.get() == '12':
-                    count_11_16(12, 'двенадцатеричной')
+                    count_0_9(13, 12, 'двенадцатеричной')
                 elif text2.get() == '13' and text3.get() == '13':
                     lab4 = tk.Label(win, text=f'Число в тринадцатеричной системе:' + str(text1.get()),
                                     font='Arial 18')
                     lab4.place(x=30, y=400)
                 elif text2.get() == '13' and text3.get() == '14':
-                    count_11_16(14, 'четырнадцатеричной')
+                    count_0_9(13, 14, 'четырнадцатеричной')
                 elif text2.get() == '13' and text3.get() == '15':
-                    count_11_16(15, 'пятнадцатеричной')
+                    count_0_9(13, 15, 'пятнадцатеричной')
                 elif text2.get() == '13' and text3.get() == '16' or var1.get() == 4:
                     x = hex(int(text1.get(), 13))[2:].upper()
                     lab4 = tk.Label(win, text=f'Число в шестнадцатеричной системе:' + str(x),
@@ -942,35 +957,35 @@ def count():
 
             if chek_E(input_name):
                 if text2.get() == '14' and text3.get() == '2' or var1.get() == 0:
-                    count_in_2()
+                    count_0_9(14, 2, 'двоичной')
                 elif text2.get() == '14' and text3.get() == '3' or var1.get() == 1:
-                    count_11_16(3, 'троичной')
+                    count_0_9(14, 3, 'троичной')
                 elif text2.get() == '14' and text3.get() == '4':
-                    count_11_16(4, 'четверичной')
+                    count_0_9(14, 4, 'четверичной')
                 elif text2.get() == '14' and text3.get() == '5':
-                    count_11_16(5, 'пятеричной')
+                    count_0_9(14, 5, 'пятеричной')
                 elif text2.get() == '14' and text3.get() == '6':
-                    count_11_16(6, 'шестеричной')
+                    count_0_9(14, 6, 'шестеричной')
                 elif text2.get() == '14' and text3.get() == '7':
-                    count_11_16(7, 'семеричной')
+                    count_0_9(14, 7, 'семеричной')
                 elif text2.get() == '14' and text3.get() == '8' or var1.get() == 2:
-                    count_11_16(8, 'восьмеричной')
+                    count_0_9(14, 8, 'восьмеричной')
                 elif text2.get() == '14' and text3.get() == '9':
-                    count_11_16(9, 'девятеричной')
+                    count_0_9(14, 9, 'девятеричной')
                 elif text2.get() == '14' and text3.get() == '10' or var1.get() == 3:
-                    count_10_2()
+                    count_10(14)
                 elif text2.get() == '14' and text3.get() == '11':
-                    count_11_16(11, 'одинадцатеричной')
+                    count_0_9(14, 11, 'одиннадцатеричной')
                 elif text2.get() == '14' and text3.get() == '12':
-                    count_11_16(12, 'двенадцатеричной')
+                    count_0_9(14, 12, 'двенадцатеричной')
                 elif text2.get() == '14' and text3.get() == '13':
-                    count_11_16(13, 'тринадцатеричной')
+                    count_0_9(14, 13, 'тринадцатеричной')
                 elif text2.get() == '14' and text3.get() == '14':
                     lab4 = tk.Label(win, text=f'Число в четырнадцатеричной системе:' + str(''.join(text1.get())),
                                     font='Arial 18')
                     lab4.place(x=30, y=400)
                 elif text2.get() == '14' and text3.get() == '15':
-                    count_11_16(15, 'пятнадцатеричной')
+                    count_0_9(14, 15, 'пятнадцатеричной')
                 elif text2.get() == '14' and text3.get() == '16' or var1.get() == 4:
                     x = hex(int(text1.get(), 14))[2:].upper()
                     lab4 = tk.Label(win, text=f'Число в шестнадцатеричной системе:' + str(x),
@@ -984,31 +999,31 @@ def count():
 
             if chek_F(input_name):
                 if text2.get() == '15' and text3.get() == '2' or var1.get() == 0:
-                    count_in_2()
+                    count_0_9(15, 2, 'двоичной')
                 elif text2.get() == '15' and text3.get() == '3' or var1.get() == 1:
-                    count_11_16(3, 'троичной')
+                    count_0_9(15, 3, 'троичной')
                 elif text2.get() == '15' and text3.get() == '4':
-                    count_11_16(4, 'четверичной')
+                    count_0_9(15, 4, 'четверичной')
                 elif text2.get() == '15' and text3.get() == '5':
-                    count_11_16(5, 'пятеричной')
+                    count_0_9(15, 5, 'пятеричной')
                 elif text2.get() == '15' and text3.get() == '6':
-                    count_11_16(6, 'шестеричной')
+                    count_0_9(15, 6, 'шестеричной')
                 elif text2.get() == '15' and text3.get() == '7':
-                    count_11_16(7, 'семеричной')
+                    count_0_9(15, 7, 'семеричной')
                 elif text2.get() == '15' and text3.get() == '8' or var1.get() == 2:
-                    count_11_16(8, 'восьмеричной')
+                    count_0_9(15, 8, 'восьмеричной')
                 elif text2.get() == '15' and text3.get() == '9':
-                    count_11_16(9, 'девятеричной')
+                    count_0_9(15, 9, 'девятеричной')
                 elif text2.get() == '15' and text3.get() == '10' or var1.get() == 3:
-                    count_10_2()
+                    count_10(15)
                 elif text2.get() == '15' and text3.get() == '11':
-                    count_11_16(11, 'одинадцатеричной')
+                    count_0_9(15, 11, 'одиннадцатеричной')
                 elif text2.get() == '15' and text3.get() == '12':
-                    count_11_16(12, 'двенадцатеричной')
+                    count_0_9(15, 12, 'двенадцатеричной')
                 elif text2.get() == '15' and text3.get() == '13':
-                    count_11_16(13, 'тринадцатеричной')
+                    count_0_9(15, 13, 'тринадцатеричной')
                 elif text2.get() == '15' and text3.get() == '14':
-                    count_11_16(14, 'четырнадцатеричной')
+                    count_0_9(15, 14, 'четырнадцатеричной')
                 elif text2.get() == '15' and text3.get() == '15':
                     lab4 = tk.Label(win, text=f'Число в пятнадцатеричной системе:' + str(''.join(text1.get())),
                                     font='Arial 18')
@@ -1026,33 +1041,33 @@ def count():
 
             if chek_5(input_name):
                 if text2.get() == '16' and text3.get() == '2' or var1.get() == 0:
-                    count_in_2()
+                    count_0_9(16, 2, 'двоичной')
                 elif text2.get() == '16' and text3.get() == '3' or var1.get() == 1:
-                    count_11_16(3, 'троичной')
+                    count_0_9(16, 3, 'троичной')
                 elif text2.get() == '16' and text3.get() == '4':
-                    count_11_16(4, 'четверичной')
+                    count_0_9(16, 4, 'четверичной')
                 elif text2.get() == '16' and text3.get() == '5':
-                    count_11_16(5, 'пятеричной')
+                    count_0_9(16, 5, 'пятеричной')
                 elif text2.get() == '16' and text3.get() == '6':
-                    count_11_16(6, 'шестеричной')
+                    count_0_9(16, 6, 'шестеричной')
                 elif text2.get() == '16' and text3.get() == '7':
-                    count_11_16(7, 'семеричной')
+                    count_0_9(16, 7, 'семеричной')
                 elif text2.get() == '16' and text3.get() == '8' or var1.get() == 2:
-                    count_11_16(8, 'восьмеричной')
+                    count_0_9(16, 8, 'восьмеричной')
                 elif text2.get() == '16' and text3.get() == '9':
-                    count_11_16(9, 'девятеричной')
+                    count_0_9(16, 9, 'девятеричной')
                 elif text2.get() == '16' and text3.get() == '10' or var1.get() == 3:
-                    count_10_2()
+                    count_10(16)
                 elif text2.get() == '16' and text3.get() == '11':
-                    count_11_16(11, 'одинадцатеричной')
+                    count_0_9(16, 11, 'одиннадцатеричной')
                 elif text2.get() == '16' and text3.get() == '12':
-                    count_11_16(12, 'двенадцатеричной')
+                    count_0_9(16, 12, 'двенадцатеричной')
                 elif text2.get() == '16' and text3.get() == '13':
-                    count_11_16(13, 'тринадцатеричной')
+                    count_0_9(16, 13, 'тринадцатеричной')
                 elif text2.get() == '16' and text3.get() == '14':
-                    count_11_16(14, 'четырнадцатеричной')
+                    count_0_9(16, 14, 'четырнадцатеричной')
                 elif text2.get() == '16' and text3.get() == '15':
-                    count_11_16(14, 'пятнадцатеричной')
+                    count_0_9(16, 15, 'пятнадцатеричной')
                 elif text2.get() == '16' and text3.get() == '16' or var1.get() == 4:
                     lab4 = tk.Label(win, text=f'Число в шестнадцатеричной системе:' + str(text1.get()),
                                     font='Arial 18')
@@ -1070,11 +1085,11 @@ def sum_funks():
     deleted()
     count()
 
-
-@eel.expose
-def inf():
-    eel.init('web')
-    eel.start("inf.html", size=(800, 900))
+#
+# @eel.expose
+# def inf():
+#     eel.init('web')
+#     eel.start("inf.html", size=(800, 900))
 
 
 def ent_1():
@@ -1090,11 +1105,11 @@ trans = tk.Button(win,
                   command=sum_funks,
                   width='13')
 
-help_setting = tk.Button(win,
-                         text='Информация',
-                         font='Arial 8',
-                         width='15',
-                         command=inf)
+# help_setting = tk.Button(win,
+#                          text='Информация',
+#                          font='Arial 8',
+#                          width='15',
+#                          command=inf)
 
 lab1 = tk.Label(win,  # создание текста"введите число"
                 text="Введите число:",
@@ -1112,12 +1127,12 @@ text3 = tk.Entry(win,
                  font='Arial 13',
                  width='5')
 trans.place(x=690, y=10)
-help_setting.place(x=690, y=40)
+# help_setting.place(x=690, y=40)
 lab1.place(x=10, y=10)
 text1.place(x=200, y=10)
 
-lab2 = tk.Label(win, text='Исходная система счисления:', font='Arial 15',
-                padx='25').place(x=50, y=130)
+tk.Label(win, text='Исходная система счисления:', font='Arial 15',
+         padx='25').place(x=50, y=130)
 
 var = tk.IntVar()
 var.set(0)
@@ -1141,7 +1156,7 @@ inp4.place(x=50, y=250)
 inp5.place(x=50, y=280)
 inp11.place(x=50, y=310)
 
-lab3 = tk.Label(win, text='Конечная система счисления:', font='Arial 15').place(x=400, y=130)
+tk.Label(win, text='Конечная система счисления:', font='Arial 15').place(x=400, y=130)
 
 var1 = tk.IntVar()
 var1.set(0)
